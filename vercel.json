@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    { "source": "/:match/:url*", "destination": "https://wd.bible/:url*" },
-    { "source": "/httpproxy/:match/:url*", "destination": "http://:match/:url*" }
+    { "source": "/(.*)", "destination": "https://wd.bible/$1" }
   ]
 }
