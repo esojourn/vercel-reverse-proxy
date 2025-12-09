@@ -90,9 +90,6 @@ export default async function handler(req, res) {
             redirect: 'follow'
         });
 
-        // 获取响应数据
-        const data = await response.text();
-
         // 复制响应headers - 排除某些不应该转发的headers
         const headersToSkip = [
             'content-encoding',  // 我们已经解码了响应
@@ -114,9 +111,12 @@ export default async function handler(req, res) {
         // 设置状态码
         res.status(response.status);
 
-        // 如果是HTML内容，注入token到localStorage
+        // 检查内容类型
         const contentType = response.headers.get('content-type') || '';
+
+        // 如果是HTML内容，作为文本处理并注入token到localStorage
         if (contentType.includes('text/html')) {
+            const data = await response.text();
             const modifiedHtml = data.replace(
                 '</head>',
                 `<script>if (typeof localStorage !== 'undefined') { localStorage.setItem('proxy_token', '${token}'); }</script></head>`
@@ -124,7 +124,9 @@ export default async function handler(req, res) {
             return res.end(modifiedHtml);
         }
 
-        return res.end(data);
+        // 对于其他内容类型（图片、字体、视频等），保持二进制数据完整性
+        const buffer = await response.arrayBuffer();
+        return res.end(Buffer.from(buffer));
     } catch (error) {
         console.error('Proxy error:', error);
         return res.status(502).json({
