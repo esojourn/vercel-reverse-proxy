@@ -5,8 +5,8 @@
     { "source": "/(.*)", "destination": "/api/[[...slug]]?slug=$1" }
   ],
   "env": {
-    "PROXY_PASSWORD": "@proxy_password",
-    "PROXY_SECRET": "@proxy_secret",
-    "PROXY_TARGET": "@proxy_target"
+    "PROXY_PASSWORD": "@PROXY_PASSWORD",
+    "PROXY_SECRET": "@PROXY_SECRET",
+    "PROXY_TARGET": "@PROXY_TARGET"
   }
 }
