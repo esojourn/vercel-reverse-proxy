@@ -93,12 +93,21 @@ export default async function handler(req, res) {
         // 获取响应数据
         const data = await response.text();
 
-        // 复制响应headers
+        // 复制响应headers - 排除某些不应该转发的headers
+        const headersToSkip = [
+            'content-encoding',  // 我们已经解码了响应
+            'transfer-encoding',
+            'connection',
+            'keep-alive',
+            'content-length'     // 内容可能被修改（注入token），长度会变化
+        ];
         response.headers.forEach((value, key) => {
-            try {
-                res.setHeader(key, value);
-            } catch {
-                // 某些header可能无法设置
+            if (!headersToSkip.includes(key.toLowerCase())) {
+                try {
+                    res.setHeader(key, value);
+                } catch {
+                    // 某些header可能无法设置
+                }
             }
         });
 
