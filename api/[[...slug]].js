@@ -49,14 +49,19 @@ export default async function handler(req, res) {
 
     // 获取目标URL
     const { slug } = req.query;
-    if (!slug || slug.length === 0) {
-        return res.status(400).json({ error: 'Missing target URL' });
-    }
 
-    // 组合目标URL
-    const path = '/' + slug.join('/');
+    // 组合目标URL - 处理根路径情况
+    let path = '/';
+    if (slug) {
+        // slug 可能是字符串或数组
+        const slugArray = Array.isArray(slug) ? slug : [slug];
+        const filteredSlug = slugArray.filter(s => s); // 过滤掉空字符串
+        if (filteredSlug.length > 0) {
+            path = '/' + filteredSlug.join('/');
+        }
+    }
     const queryString = Object.entries(req.query)
-        .filter(([key]) => key !== 'slug')
+        .filter(([key]) => key !== 'slug' && key !== 'token')
         .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
         .join('&');
 
