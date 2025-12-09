@@ -170,6 +170,8 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.valid) {
+                            // 确保 cookie 也被设置
+                            document.cookie = `proxy_token=${token}; path=/; max-age=604800; SameSite=Lax`;
                             redirectToDashboard();
                         }
                     })
@@ -205,6 +207,8 @@
                     messageDiv.innerHTML = '登录成功，正在跳转...';
                     messageDiv.className = 'success';
                     localStorage.setItem('proxy_token', data.token);
+                    // 同时设置 cookie，这样后续请求会自动携带 token
+                    document.cookie = `proxy_token=${data.token}; path=/; max-age=604800; SameSite=Lax`;
                     setTimeout(redirectToDashboard, 500);
                 } else {
                     messageDiv.innerHTML = data.message || '密码错误';
