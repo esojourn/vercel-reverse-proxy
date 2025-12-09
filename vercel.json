@@ -3,10 +3,5 @@
     { "source": "/login.html", "destination": "/public/login.html" },
     { "source": "/api/verify", "destination": "/api/verify" },
     { "source": "/(.*)", "destination": "/api/[[...slug]]?slug=$1" }
-  ],
-  "env": {
-    "PROXY_PASSWORD": "@PROXY_PASSWORD",
-    "PROXY_SECRET": "@PROXY_SECRET",
-    "PROXY_TARGET": "@PROXY_TARGET"
-  }
+  ]
 }
