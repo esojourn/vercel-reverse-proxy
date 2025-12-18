@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     if (!token || !verifyToken(token)) {
         return res.status(401).json({
             error: 'Unauthorized',
-            message: '需要登录。请访问 /login.html'
+            message: '对不起，自用小道，太多人用账单会爆。代码已经开源，欢迎自建服务。请访问 /login.html '
         });
     }
 

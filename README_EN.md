@@ -11,6 +11,10 @@ A Vercel-hosted reverse proxy with password protection. Completely free, versati
 - ✅ **Universal Proxy** - Can proxy any HTTPS/HTTP interface
 - ✅ **Completely Free** - Deployed on Vercel's free tier
 - ✅ **Flexible Configuration** - Easily configure the proxy target URL
+- ✅ **Binary Content Support** - Perfectly handles images, fonts, videos, and other binary resources
+- ✅ **Cookie Authentication** - Automatically sets cookies on login for enhanced compatibility
+- ✅ **Root Path Proxy** - Supports proxying to the target site's root path (/)
+- ✅ **Smart Header Filtering** - Automatically filters problematic response headers to prevent browser errors
 
 ## Quick Start
 
@@ -92,6 +96,39 @@ curl -H "Authorization: Bearer YOUR_TOKEN" https://yourdomain.com/api/example.co
 curl -H "Cookie: proxy_token=YOUR_TOKEN" https://yourdomain.com/api/example.com/data
 ```
 
+**Note**: After login, cookies are automatically set and included in browser requests. Typically, browser-based access does not require manually passing the token. The three methods above are primarily for programmatic API access.
+
+## Technical Features
+
+### Binary Content Handling
+The proxy correctly handles various content types:
+- **HTML Pages**: Automatically injects token into localStorage for persistent login
+- **Image Resources**: PNG, JPG, GIF, WebP, etc. with full integrity
+- **Font Files**: WOFF, WOFF2, TTF, and other binary font formats
+- **Video and Audio**: MP4, WebM, MP3, and other streaming media files
+- **Other Binary Files**: PDFs, ZIP archives, and other document types
+
+All binary data is processed using `arrayBuffer()` to ensure data integrity is preserved.
+
+### Smart Response Header Filtering
+The proxy automatically filters response headers that may cause issues:
+- `content-encoding`: Already decoded by the fetch API
+- `transfer-encoding`: Not needed for direct response forwarding
+- `connection`, `keep-alive`: Managed automatically by the HTTP layer
+- `content-length`: May be incorrect after HTML token injection
+
+This prevents browser errors like `ERR_CONTENT_DECODING_FAILED`.
+
+### Cookie Authentication Mechanism
+After successful login, the system stores the token using two methods:
+1. **localStorage**: `proxy_token` key-value pair
+2. **Cookie**: `proxy_token` cookie (7-day validity)
+
+This ensures maximum compatibility:
+- Browser Access: Automatically includes cookie in requests
+- API Calls: Can use Header or URL parameter methods
+- Cross-Origin Requests: Supports Authorization Bearer method
+
 ## Use Cases
 
 ### OpenAI API Acceleration
@@ -126,8 +163,7 @@ vercel-reverse-proxy/
 │   ├── verify.js           # Password verification API
 │   └── [[...slug]].js      # Reverse proxy handler
 ├── public/
-│   ├── login.html          # Login page
-│   └── index.html          # Home page redirect
+│   └── login.html          # Login page
 ├── vercel.json             # Vercel configuration
 ├── CLAUDE.md               # Claude Code development guide
 ├── README.md               # Chinese documentation
@@ -158,6 +194,15 @@ A: Simply modify the `PROXY_TARGET` environment variable in your Vercel project 
 
 **Q: Do tokens expire?**
 A: No, tokens are stored in your browser's local storage and remain valid indefinitely unless you manually clear them or clear your browser data.
+
+**Q: Why are images or other resources not loading?**
+A: Please ensure you're using the latest version of the code. Older versions may have issues with binary content handling. The latest version correctly handles all types of binary resources (images, fonts, videos, etc.).
+
+**Q: What if I encounter ERR_CONTENT_DECODING_FAILED errors?**
+A: This issue has been fixed in the latest version. The proxy now automatically filters problematic response headers. If you still encounter this error, try redeploying.
+
+**Q: What happens when accessing the root path (/)?**
+A: After token validation, root path requests are proxied to the root path of `PROXY_TARGET`. Instead of showing a static homepage, it now directly displays the target website content.
 
 ## License
 
